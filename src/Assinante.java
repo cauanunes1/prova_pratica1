@@ -9,6 +9,10 @@ import java.util.List;
 public class Assinante {
     public static final double TARIFA_BASE = 29.90;
     public static final int MINUTOS_ISENCAO = 600;
+    private static final double INICIANTE = 0.1;
+    private static final double REGULAR = 0.5;
+    private static final double ENGAJADO = 0.75;
+    private static final double BINGE = 0.75;
 
     private String nome;
     private List<Episodio> episodios;
@@ -77,16 +81,41 @@ public class Assinante {
      */
     public Engajamento classificacaoEngajamento() {
         //TODO Tarefa 2
+        double proporcao;
+        if (this.episodios==null){
+            return Engajamento.INICIANTE;
+        }
+        try{
+            proporcao = tempoTotalAssistido()/(tempoTotalAssistido() + creditoDeTempo());
+        } catch(Exception e){
+            return Engajamento.INICIANTE;
+        }
+        if (proporcao<=INICIANTE){
+            return Engajamento.INICIANTE;
+        } else if(proporcao<=REGULAR){
+            return Engajamento.REGULAR;
+        } else if (proporcao<=ENGAJADO){
+            return Engajamento.ENGAJADO;
+        } else if (proporcao>BINGE){
+            return Engajamento.BINGE;
+        }
         return Engajamento.INICIANTE;
     }
 
     /**
-     * 0 se tempo assistido &gt; 600 minutos;
+     * 0 se tempo assistido >; 600 minutos;
      * caso contrário, TARIFA_BASE multiplicada pelo fator da classificação.
      */
     public double tarifaMensal() {
         //TODO Tarefa 3
-        return 0.0;
+        if (tempoTotalAssistido()>=MINUTOS_ISENCAO){
+            return 0.0;
+        }
+
+        double soma;
+        double fator = classificacaoEngajamento().getFator();
+        soma = TARIFA_BASE * fator;
+        return soma;
     }
 
     public String resumo() {
